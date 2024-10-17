@@ -12,3 +12,9 @@ export interface IDishMutation {
   urlImage: string;
   price: number;
 }
+
+
+export interface DishCart {
+  dish: IDish;
+  amount: number;
+}
