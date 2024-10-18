@@ -1,14 +1,14 @@
 import ToolBar from "./components/ToolBar/ToolBar.tsx";
-import DishForm from "./components/DishForm/DishForm.tsx";
-import Cart from "./components/Cart/Cart.tsx";
-import Dishes from "./components/Dishes/Dishes.tsx";
 import { useState } from "react";
 import { DishCart, IDish } from './types';
-import Modal from './components/UI/Modal/Modal.tsx';
+import Home from './containers/Home/Home.tsx';
+import NewDish from './containers/NewDish/NewDish.tsx';
+import { Route, Routes } from 'react-router-dom';
+import Checkout from './containers/Checkout/Checkout.tsx';
+import Order from './containers/Order/Order.tsx';
 
 const App = () => {
   const [cart, setCart] = useState<DishCart[]>([]);
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [dishes, setDishes] = useState<IDish[]>([
     {
       id: '1',
@@ -55,30 +55,21 @@ const App = () => {
     });
   };
 
-  const closeModalWindow = () => {
-    setShowModal(!showModal);
-  };
-
   return (
     <>
-      <Modal show={showModal} closeModal={closeModalWindow} title="Order">
-          Список sdvsdv
-      </Modal>
       <header>
         <ToolBar />
       </header>
       <main className="container mt-4">
         <div className="row">
-          <div className="col-4 mb-2">
-            <DishForm addNewDish={addNewDish} />
-          </div>
-          <div className="col-4 mb-2">
-            <Dishes dishes={dishes} addToCart={AddDishToCart}/>
-          </div>
-          <div className="col-4 mb-2">
-            <Cart cart={cart} />
-            <button className="btn btn-primary" onClick={() => setShowModal(!showModal)}>Order</button>
-          </div>
+          <Routes>
+            <Route path="/" element={<Home dishes={dishes} AddDishToCart={AddDishToCart} cart={cart}/>}/>
+            <Route path="/newDish" element={<NewDish addNewDish={addNewDish}/>}/>
+            <Route path="/checkout" element={<Checkout cart={cart}/>}>
+              <Route path="continue" element={<Order/>} />
+            </Route>
+            <Route path="*" element={<h1>Not found</h1>}/>
+          </Routes>
         </div>
       </main>
     </>

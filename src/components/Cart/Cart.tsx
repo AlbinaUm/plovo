@@ -1,43 +1,36 @@
-import CartItem from './CartItem.tsx';
 import { DishCart } from '../../types';
 import * as React from 'react';
+import Modal from '../UI/Modal/Modal.tsx';
+import { useState } from 'react';
+import CartDishes from './CartDishes/CartDishes.tsx';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   cart: DishCart[];
 }
 
 const Cart: React.FC<Props> = ({cart}) => {
-
-  const total = cart.reduce((acc, cartDish) => {
-    acc = acc + cartDish.dish.price * cartDish.amount;
-    return acc;
-  }, 0);
-
-  let cartList = (
-    <>
-      <h6 className="text-center my-4">No dish yet. Add something ...</h6>
-    </>
-  );
-
-  if (cart.length > 0) {
-    cartList = (
-      <div>
-        {cart.map(cartDish => (
-          <CartItem key={cartDish.dish.id} cartDish={cartDish}/>
-        ))}
-
-        <div className="row align-items-center justify-content-between">
-          <div className="text-start col-4 p-0"><p><strong>Total: </strong></p></div>
-          <div className="text-end col-4 p-0"><p>{total} SOM</p></div>
-        </div>
-      </div>
-    );
-  }
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   return (
     <>
+      <Modal show={showModal} closeModal={() => setShowModal(false)} title="Order">
+        <div className="modal-body">
+          <p>Do you want to continue to checkout?</p>
+        </div>
+        <div className="text-end">
+          <button className="btn btn-success" onClick={() => navigate('/checkout')}>Continue</button>
+        </div>
+      </Modal>
+
       <h4>Cart</h4>
-      {cartList}
+      <CartDishes cart={cart}/>
+      {cart.length > 0 ?
+        <div className="text-center">
+          <button className="btn btn-primary" onClick={() => setShowModal(true)}>Order</button>
+        </div> : null
+      }
     </>
   );
 };
