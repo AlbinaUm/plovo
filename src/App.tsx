@@ -66,7 +66,7 @@ const App = () => {
             <Route path="/" element={<Home dishes={dishes} AddDishToCart={AddDishToCart} cart={cart}/>}/>
             <Route path="/newDish" element={<NewDish addNewDish={addNewDish}/>}/>
             <Route path="/checkout" element={<Checkout cart={cart}/>}>
-              <Route path="continue" element={<Order/>} />
+              <Route path="continue" element={<Order cart={cart}/>} />
             </Route>
             <Route path="*" element={<h1>Not found</h1>}/>
           </Routes>
