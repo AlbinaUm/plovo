@@ -1,18 +1,22 @@
 import { useState } from "react";
-import { IDish, IDishMutation } from "../../types";
+import { ApiDish, IDishMutation } from '../../types';
 import * as React from "react";
 
 interface Props {
-  addNewDish: (dish: IDish) => void;
+  addNewDish: (dish: ApiDish) => void;
+  existingDish?: IDishMutation;
+  isEdit?: boolean;
 }
 
-const DishForm: React.FC<Props> = ({ addNewDish }) => {
-  const [newDish, setNewDish] = useState<IDishMutation>({
-    name: "",
-    description: "",
-    urlImage: "",
-    price: 0,
-  });
+const initialStateForm = {
+  name: "",
+  description: "",
+  urlImage: "",
+  price: 0,
+};
+
+const DishForm: React.FC<Props> = ({ addNewDish, existingDish = initialStateForm, isEdit = false }) => {
+  const [newDish, setNewDish] = useState<IDishMutation>(existingDish);
 
   const changeDish = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -30,23 +34,24 @@ const DishForm: React.FC<Props> = ({ addNewDish }) => {
       alert("Заполните все поля!");
     } else {
       addNewDish({
-        id: String(new Date()),
         ...newDish,
         price: Number(newDish.price),
       });
 
-      setNewDish({
-        name: "",
-        description: "",
-        urlImage: "",
-        price: 0,
-      });
+      if (!isEdit) {
+        setNewDish({
+          name: "",
+          description: "",
+          urlImage: "",
+          price: 0,
+        });
+      }
     }
   };
 
   return (
     <form onSubmit={onSubmit}>
-      <h3>Add new dish</h3>
+      <h3>{isEdit ? 'Edit'  : 'Add new'} dish</h3>
       <div className="form-group mb-2">
         <label htmlFor="name">Title:</label>
         <input
@@ -95,7 +100,7 @@ const DishForm: React.FC<Props> = ({ addNewDish }) => {
       </div>
 
       <button type="submit" className="btn btn-primary">
-        Add
+        {isEdit ? 'Edit' : 'Add'}
       </button>
     </form>
   );

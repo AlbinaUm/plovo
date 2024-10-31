@@ -1,44 +1,56 @@
 import ToolBar from "./components/ToolBar/ToolBar.tsx";
-import { useState } from "react";
-import { DishCart, IDish } from './types';
+import { useCallback, useEffect, useState } from 'react';
+import { DishCart, DishesList, IDish } from './types';
 import Home from './containers/Home/Home.tsx';
 import NewDish from './containers/NewDish/NewDish.tsx';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import Checkout from './containers/Checkout/Checkout.tsx';
 import Order from './containers/Order/Order.tsx';
+import axiosApi from './axiosAPI.ts';
+import EditDish from './containers/EditDish/EditDish.tsx';
+
 
 const App = () => {
   const [cart, setCart] = useState<DishCart[]>([]);
-  const [dishes, setDishes] = useState<IDish[]>([
-    {
-      id: '1',
-      name: "Plov",
-      description: "taste",
-      price: 200,
-      urlImage:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Polu.jpg/274px-Polu.jpg",
-    },
-    {
-      id: '2',
-      name: "Pizza",
-      description: "cheese",
-      price: 500,
-      urlImage:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Polu.jpg/274px-Polu.jpg",
-    },
-    {
-      id: '3',
-      name: "Shaurma",
-      description: "---",
-      price: 250,
-      urlImage:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Polu.jpg/274px-Polu.jpg",
-    },
-  ]);
+  const [dishes, setDishes] = useState<IDish[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const location = useLocation();
 
-  const addNewDish = (newDish: IDish) => {
-    setDishes((prevState) => [...prevState, newDish]);
-  };
+  const fetchDishes = useCallback(async () => {
+    try {
+      setLoading(true);
+      const reponseDishes: {data: DishesList | null} = await axiosApi('dishes.json');
+      const dishesList = reponseDishes.data;
+      console.log(dishesList);
+
+      if (dishesList === null) {
+        setDishes([]);
+        return;
+      }
+
+      const dishes: DishesList = dishesList;
+
+      const dishesInMyFormat = Object.keys(dishesList).map(dish => {
+        return {
+          ...dishes[dish],
+          id: dish
+        };
+      })
+
+      setDishes(dishesInMyFormat);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+
+  }, []);
+
+  useEffect(() => {
+    if (location.pathname === '/') {
+      void fetchDishes();
+    }
+  }, [fetchDishes, location.pathname]);
 
   const AddDishToCart = (dish: IDish) => {
     setCart(prevState => {
@@ -63,8 +75,9 @@ const App = () => {
       <main className="container mt-4">
         <div className="row">
           <Routes>
-            <Route path="/" element={<Home dishes={dishes} AddDishToCart={AddDishToCart} cart={cart}/>}/>
-            <Route path="/newDish" element={<NewDish addNewDish={addNewDish}/>}/>
+            <Route path="/" element={<Home fetchDishes={fetchDishes} dishes={dishes} AddDishToCart={AddDishToCart} cart={cart} isLoadingDishes={loading}/>}/>
+            <Route path="/newDish" element={<NewDish />}/>
+            <Route path="/editDish/:id" element={<EditDish />}/>
             <Route path="/checkout" element={<Checkout cart={cart}/>}>
               <Route path="continue" element={<Order cart={cart}/>} />
             </Route>
