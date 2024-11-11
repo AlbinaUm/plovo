@@ -39,3 +39,12 @@ export type ApiDish = Omit<IDishMutation, 'id'>
 export interface DishesList {
   [id: string]: ApiDish
 }
+
+export interface IOrdersAPI {
+  [id: string]: IOrderMutation;
+}
+
+export interface IOrder extends  IOrderMutation {
+  id: string;
+  totalPrice: number;
+}

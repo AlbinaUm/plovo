@@ -4,32 +4,31 @@ import { ApiDish } from '../../types';
 import axiosApi from '../../axiosAPI.ts';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../../components/UI/Spinner/Spinner.tsx';
+import { toast } from 'react-toastify';
 
 interface Props {
 }
 
 const NewDish: React.FC<Props> = () => {
-  const [loading, setLoading] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
   const navigate = useNavigate();
 
   const addNewDish = async (dish: ApiDish) => {
     try {
-      setLoading(true);
+      setAddLoading(true);
       await axiosApi.post('dishes.json', dish);
       navigate('/');
+      toast.success("Dish was added successfully!");
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      setAddLoading(false);
     }
   };
 
   return (
     <div className="mb-2">
-      {loading ? <Spinner/> :
-        <DishForm addNewDish={addNewDish}/>
-      }
+      <DishForm addNewDish={addNewDish} isLoading={addLoading}/>
     </div>
   );
 };

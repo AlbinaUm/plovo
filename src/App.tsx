@@ -1,4 +1,3 @@
-import ToolBar from "./components/ToolBar/ToolBar.tsx";
 import { useCallback, useEffect, useState } from 'react';
 import { DishCart, DishesList, IDish } from './types';
 import Home from './containers/Home/Home.tsx';
@@ -8,6 +7,8 @@ import Checkout from './containers/Checkout/Checkout.tsx';
 import Order from './containers/Order/Order.tsx';
 import axiosApi from './axiosAPI.ts';
 import EditDish from './containers/EditDish/EditDish.tsx';
+import Orders from './containers/Orders/Orders.tsx';
+import Layout from './components/Layout/Layout.tsx';
 
 
 const App = () => {
@@ -52,6 +53,31 @@ const App = () => {
     }
   }, [fetchDishes, location.pathname]);
 
+  const updateCart = useCallback(() => {
+    setCart(prevDishesCart => {
+      return prevDishesCart.map((cartDish) => {
+        const updateDish = dishes.find(d => d.id === cartDish.dish.id);
+
+        if (updateDish) {
+          return {
+            ...cartDish,
+            dish: updateDish
+          }
+        }
+
+        return cartDish;
+      });
+    });
+  }, [dishes]);
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  useEffect(() => {
+    void updateCart();
+  }, [updateCart]);
+
   const AddDishToCart = (dish: IDish) => {
     setCart(prevState => {
       let indexDish = prevState.findIndex(dishCart => dishCart.dish === dish);
@@ -69,22 +95,18 @@ const App = () => {
 
   return (
     <>
-      <header>
-        <ToolBar />
-      </header>
-      <main className="container mt-4">
-        <div className="row">
-          <Routes>
-            <Route path="/" element={<Home fetchDishes={fetchDishes} dishes={dishes} AddDishToCart={AddDishToCart} cart={cart} isLoadingDishes={loading}/>}/>
-            <Route path="/newDish" element={<NewDish />}/>
-            <Route path="/editDish/:id" element={<EditDish />}/>
-            <Route path="/checkout" element={<Checkout cart={cart}/>}>
-              <Route path="continue" element={<Order cart={cart}/>} />
-            </Route>
-            <Route path="*" element={<h1>Not found</h1>}/>
-          </Routes>
-        </div>
-      </main>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home fetchDishes={fetchDishes} dishes={dishes} AddDishToCart={AddDishToCart} cart={cart} isLoadingDishes={loading}/>}/>
+          <Route path="/newDish" element={<NewDish />}/>
+          <Route path="/editDish/:id" element={<EditDish />}/>
+          <Route path="/checkout" element={<Checkout cart={cart}/>}>
+            <Route path="continue" element={<Order cart={cart} clearCart={clearCart}/>} />
+          </Route>
+          <Route path="/orders" element={<Orders/>}/>
+          <Route path="*" element={<h1>Not found</h1>}/>
+        </Routes>
+      </Layout>
     </>
   );
 };

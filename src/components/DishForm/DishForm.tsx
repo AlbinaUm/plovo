@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { ApiDish, IDishMutation } from '../../types';
 import * as React from "react";
+import ButtonLoading from '../UI/ButtonLoading/ButtonLoading.tsx';
 
 interface Props {
   addNewDish: (dish: ApiDish) => void;
   existingDish?: IDishMutation;
   isEdit?: boolean;
+  isLoading?: boolean;
 }
 
 const initialStateForm = {
@@ -15,7 +17,7 @@ const initialStateForm = {
   price: 0,
 };
 
-const DishForm: React.FC<Props> = ({ addNewDish, existingDish = initialStateForm, isEdit = false }) => {
+const DishForm: React.FC<Props> = ({ addNewDish, existingDish = initialStateForm, isEdit = false, isLoading = false }) => {
   const [newDish, setNewDish] = useState<IDishMutation>(existingDish);
 
   const changeDish = (
@@ -99,9 +101,12 @@ const DishForm: React.FC<Props> = ({ addNewDish, existingDish = initialStateForm
         />
       </div>
 
-      <button type="submit" className="btn btn-primary">
-        {isEdit ? 'Edit' : 'Add'}
-      </button>
+      <ButtonLoading text={isEdit ? 'Edit' : 'Add'} isLoading={isLoading} isDisabled={isLoading} />
+
+      {/*<button disabled={isLoading} type="submit" className="btn btn-primary d-flex align-items-center">*/}
+      {/*  <span className="me-2">{isEdit ? 'Edit' : 'Add'}</span>*/}
+      {/*  {isLoading ? <ButtonSpinner/> : null}*/}
+      {/*</button>*/}
     </form>
   );
 };

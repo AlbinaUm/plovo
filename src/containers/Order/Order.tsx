@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
   cart: DishCart[];
+  clearCart: () => void;
 }
 
 
@@ -15,7 +16,7 @@ const initialStateToCustomer = {
   phone: '',
 };
 
-const Order: React.FC<Props> = ({cart}) => {
+const Order: React.FC<Props> = ({cart, clearCart}) => {
   const [customer, setCustomer] = useState(initialStateToCustomer);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ const Order: React.FC<Props> = ({cart}) => {
     try {
       setLoading(true);
       await axiosApi.post('orders.json', order);
+      clearCart();
       navigate('/');
     } catch (e) {
       console.error(e);
