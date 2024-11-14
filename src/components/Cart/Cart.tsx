@@ -1,17 +1,16 @@
-import { DishCart } from '../../types';
-import * as React from 'react';
 import Modal from '../UI/Modal/Modal.tsx';
 import { useState } from 'react';
 import CartDishes from './CartDishes/CartDishes.tsx';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../app/hooks.ts';
+import { selectCartDishes } from '../../store/slices/cartSlice.ts';
 
-interface Props {
-  cart: DishCart[];
-}
 
-const Cart: React.FC<Props> = ({cart}) => {
+
+const Cart = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const navigate = useNavigate();
+  const cartDishes = useAppSelector(selectCartDishes);
 
   return (
     <>
@@ -25,8 +24,8 @@ const Cart: React.FC<Props> = ({cart}) => {
       </Modal>
 
       <h4>Cart</h4>
-      <CartDishes cart={cart}/>
-      {cart.length > 0 ?
+      <CartDishes cart={cartDishes}/>
+      {cartDishes.length > 0 ?
         <div className="text-center">
           <button className="btn btn-primary" onClick={() => setShowModal(true)}>Order</button>
         </div> : null

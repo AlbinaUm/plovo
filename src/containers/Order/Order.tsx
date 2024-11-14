@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import { DishCart } from '../../types';
 import axiosApi from '../../axiosAPI.ts';
 import Spinner from '../../components/UI/Spinner/Spinner.tsx';
 import { useNavigate } from 'react-router-dom';
-
-interface Props {
-  cart: DishCart[];
-  clearCart: () => void;
-}
-
+import { useAppDispatch, useAppSelector } from '../../app/hooks.ts';
+import { clearCart, selectCartDishes } from '../../store/slices/cartSlice.ts';
 
 const initialStateToCustomer = {
   name: '',
@@ -16,10 +11,13 @@ const initialStateToCustomer = {
   phone: '',
 };
 
-const Order: React.FC<Props> = ({cart, clearCart}) => {
+const Order = () => {
   const [customer, setCustomer] = useState(initialStateToCustomer);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+  const cart = useAppSelector(selectCartDishes);
+  const dispatch = useAppDispatch();
+
 
   const onChangeField = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
@@ -43,7 +41,7 @@ const Order: React.FC<Props> = ({cart, clearCart}) => {
     try {
       setLoading(true);
       await axiosApi.post('orders.json', order);
-      clearCart();
+      dispatch(clearCart());
       navigate('/');
     } catch (e) {
       console.error(e);
